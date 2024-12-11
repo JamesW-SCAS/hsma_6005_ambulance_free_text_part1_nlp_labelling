@@ -8,6 +8,7 @@ from spacy import displacy
 nlp = en_core_web_sm.load()
 
 # Read the clinical data into a dataframe, selecting only certain columns
+# NEXT - TRY WITH MORE THAN ONE FREE TEXT COLUMN
 filtered_cols = [
     'CareepisodeID',
     'impressionPlan'
@@ -42,7 +43,7 @@ print(df.head(3))
 # Visualize the entities in displacy
 for index, row in df.iterrows():
     doc = nlp(row['impressionPlan'])
-    # displacy.render(doc, style="ent", jupyter=True)
+    displacy.render(doc, style="ent", jupyter=True)
     # New loop to ID 12 lead ecg
     for token in doc:
         # Check if token is like a number
@@ -52,3 +53,9 @@ for index, row in df.iterrows():
             # Check if next token is "lead"
             if next_token.text == "lead":
                 print("12-lead ECG found:", token.text, next_token.text)
+                # Add a 12-lead flag in new column
+                df.loc[index, 'twelve_lead_flag'] = 1
+
+# Print results of new flag
+print(df.twelve_lead_flag.value_counts())
+df.loc[df.twelve_lead_flag==1, :]
