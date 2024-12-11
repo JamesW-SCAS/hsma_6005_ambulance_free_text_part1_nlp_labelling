@@ -10,16 +10,21 @@ nlp = en_core_web_sm.load()
 # Read the clinical data into a dataframe, selecting only certain columns
 filtered_cols = [
     'CareepisodeID',
-    'presentingConditionChiefComplaintHistoryFreeText'
+    'impressionPlan'
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=10
+, nrows=15
 )
 # Drop any rows with null data
 df.dropna(
-    subset='presentingConditionChiefComplaintHistoryFreeText',
+    subset='impressionPlan',
  inplace=True)
+
+# TEST ROW FOR 12 LEAD ECG - Remove later
+df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# force in some text to check how Spacy handles various entries
+df.iloc[0,1] = "12 lead, 12lead, twelve lead, twelvelead"
 
 # Function to extract named entities
 def extract_named_entities(text):
@@ -28,7 +33,7 @@ def extract_named_entities(text):
     return entities
 
 # Apply the function to the 'text' column
-df['named_entities'] = df['presentingConditionChiefComplaintHistoryFreeText']\
+df['named_entities'] = df['impressionPlan']\
     .apply(extract_named_entities)
 
 # Print three example lines from the df head
@@ -36,5 +41,5 @@ print(df.head(3))
 
 # Visualize the entities in displacy
 for index, row in df.iterrows():
-    doc = nlp(row['presentingConditionChiefComplaintHistoryFreeText'])
+    doc = nlp(row['impressionPlan'])
     displacy.render(doc, style="ent", jupyter=True)
