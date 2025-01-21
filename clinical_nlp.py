@@ -9,6 +9,7 @@ nlp = en_core_web_sm.load()
 
 # Read the clinical data into a dataframe, selecting only certain columns
 # NEXT - TRY WITH MORE THAN ONE FREE TEXT COLUMN
+# ALSO LOOK IN THE ZOLL FIELD OF EPR FOR 12 LEAD
 filtered_cols = [
     'CareepisodeID',
     'impressionPlan'
@@ -23,7 +24,7 @@ df.dropna(
  inplace=True)
 
 # TEST ROW FOR 12 LEAD ECG - Remove later
-# df = df[3:4] # Row contains a great positive/negative 12 lead example 
+df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # force in some text to check how Spacy handles various entries
 # df.iloc[0,1] = "12 lead, 12lead, twelve lead, twelvelead"
 
@@ -41,6 +42,7 @@ df['named_entities'] = df['impressionPlan']\
 print(df.head(3))
 
 # Visualize the entities in displacy
+# Check for numbers and presence of "lead" - print and flag in new column
 for index, row in df.iterrows():
     doc = nlp(row['impressionPlan'])
     displacy.render(doc, style="ent", jupyter=True)
@@ -58,4 +60,4 @@ for index, row in df.iterrows():
 
 # Print results of new flag
 print(df.twelve_lead_flag.value_counts())
-df.loc[df.twelve_lead_flag==1, :]
+df.loc[df.twelve_lead_flag == 1, :]
