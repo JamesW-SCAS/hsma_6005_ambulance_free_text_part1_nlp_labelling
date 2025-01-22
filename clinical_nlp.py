@@ -13,13 +13,15 @@ nlp = en_core_web_sm.load()
 # Read the clinical data into a dataframe, selecting only certain columns
 # NEXT - TRY WITH MORE THAN ONE FREE TEXT COLUMN
 # ALSO LOOK IN THE ZOLL FIELD OF EPR FOR 12 LEAD
+
 filtered_cols = [
     'CareepisodeID',
-    'impressionPlan'
+    'impressionPlan',
+    'injuryIllnessDetails'
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-# , nrows=20
+, nrows=20
 , encoding_errors='ignore'
 )
 # Drop any rows with null data
@@ -49,7 +51,11 @@ df['matched_spans'] = ''
 
 # Apply the matcher to each row of the dataframe:
 for index, row in df.iterrows():
-    doc = nlp(row['impressionPlan'])
+    # Combine text in multiple columsn into a single string and pass to nlp
+    doc = nlp(row['impressionPlan']
+    + ' '
+    + row['injuryIllnessDetails']
+    )
     matches = matcher(doc)
     
     # List to store all matches for this row
