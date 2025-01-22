@@ -19,7 +19,8 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=100
+, nrows=20
+, encoding_errors='ignore'
 )
 # Drop any rows with null data
 df.dropna(
@@ -29,8 +30,7 @@ df.dropna(
 # # TEST ROW FOR 12 LEAD ECG - Remove later
 # df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # # force in some text to check how Spacy handles various entries
-# df.iloc[0,1] = "patient had a twelve_lead, , TWELVE LEAD, a 12 lead,\
-#  a 12-lead and a 3 lead"
+# df.iloc[0,1] = "twelve lead"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
@@ -40,18 +40,33 @@ twelve_lead_pattern_1 = [{"ORTH" : "12"}, {"IS_PUNCT": True, "OP": "?"},
 twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
  {"LOWER": "lead"}]
 # Add rules to account for underscores (which Spacy uses to split tokens)
-# THESE DON'T SEEM TO WORK!
+# UNDERSCORE PATTERNS DON'T SEEM TO WORK!
 twelve_lead_pattern_3 = [{"LOWER": "12"}, {"ORTH": "_"}, {"LOWER": "lead"}]
 twelve_lead_pattern_4 = [{"LOWER": "twelve"}, {"ORTH": "_"}, {"LOWER": "lead"}]
 # Add the pattern(s) to the Matcher
 matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2,
 twelve_lead_pattern_3, twelve_lead_pattern_4])
 
+# Create a new column to store all matches
+df['matched_spans'] = ''
+
 # Apply the matcher to each row of the dataframe:
 for index, row in df.iterrows():
     doc = nlp(row['impressionPlan'])
     matches = matcher(doc)
-    # Print the matches
+    
+    # List to store all matches for this row
+    row_matches = []
+    
+    # Process all matches
     for match_id, start, end in matches:
         span = doc[start:end]
-        print(f"Matched span: {span.text}")
+        row_matches.append(span.text)
+        print(f"Row {index}, Matched span: {span.text}")
+    
+    # Join all matches for this row into a single string
+    df.at[index, 'matched_spans'] = '; '.join(row_matches)
+
+# Print summary
+print(f"\nTotal rows with matches: {df['matched_spans'].astype(bool).sum()}")
+print(f"Total rows in dataframe: {len(df)}")
