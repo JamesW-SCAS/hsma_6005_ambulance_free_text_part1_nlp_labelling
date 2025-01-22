@@ -21,7 +21,7 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=20
+# , nrows=20
 , encoding_errors='ignore'
 )
 # Drop any rows with null data
@@ -43,8 +43,7 @@ twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
 {"LOWER": "lead"}]
 
 # Add the pattern(s) to the Matcher
-matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2,
-twelve_lead_pattern_3, twelve_lead_pattern_4])
+matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2])
 
 # Create a new column to store all matches
 df['matched_spans'] = ''
@@ -52,9 +51,9 @@ df['matched_spans'] = ''
 # Apply the matcher to each row of the dataframe:
 for index, row in df.iterrows():
     # Combine text in multiple columsn into a single string and pass to nlp
-    doc = nlp(row['impressionPlan']
+    doc = nlp(str(row['impressionPlan'])
     + ' '
-    + row['injuryIllnessDetails']
+    + str(row['injuryIllnessDetails'])
     )
     matches = matcher(doc)
     
