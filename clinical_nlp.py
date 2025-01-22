@@ -19,7 +19,7 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=20
+# , nrows=20
 , encoding_errors='ignore'
 )
 # Drop any rows with null data
@@ -28,24 +28,18 @@ df.dropna(
  inplace=True)
 
 # # TEST ROW FOR 12 LEAD ECG - Remove later
-df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # # force in some text to check how Spacy handles various entries
-df.iloc[0,1] = "12      lead"
+# df.iloc[0,1] = "12      lead"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
 # Create a pattern to match 12 lead, including text and punctuation:
 twelve_lead_pattern_1 = [{"ORTH" : "12"}, {"IS_PUNCT": True, "OP": "?"},
-# add a regex to account for multiple whitespaces between tokens
- {"TEXT": {"REGEX": "\s+"}},
- {"LOWER" : "lead"}]
+{"LOWER" : "lead"}]
 twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
- {"TEXT": {"REGEX": "\s+"}},
- {"LOWER": "lead"}]
-# Add rules to account for underscores (which Spacy uses to split tokens)
-# UNDERSCORE PATTERNS DON'T SEEM TO WORK!
-twelve_lead_pattern_3 = [{"LOWER": "12"}, {"ORTH": "_"}, {"LOWER": "lead"}]
-twelve_lead_pattern_4 = [{"LOWER": "twelve"}, {"ORTH": "_"}, {"LOWER": "lead"}]
+{"LOWER": "lead"}]
+
 # Add the pattern(s) to the Matcher
 matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2,
 twelve_lead_pattern_3, twelve_lead_pattern_4])
