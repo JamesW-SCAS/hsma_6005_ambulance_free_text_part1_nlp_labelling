@@ -26,10 +26,11 @@ df.dropna(
     subset='impressionPlan',
  inplace=True)
 
-# TEST ROW FOR 12 LEAD ECG - Remove later
-df = df[3:4] # Row contains a great positive/negative 12 lead example 
-# force in some text to check how Spacy handles various entries
-df.iloc[0,1] = "patient had a twelve_lead, , TWELVE LEAD, a 12 lead, a 12-lead and a 3 lead"
+# # TEST ROW FOR 12 LEAD ECG - Remove later
+# df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# # force in some text to check how Spacy handles various entries
+# df.iloc[0,1] = "patient had a twelve_lead, , TWELVE LEAD, a 12 lead,\
+#  a 12-lead and a 3 lead"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
@@ -46,47 +47,11 @@ twelve_lead_pattern_4 = [{"LOWER": "twelve"}, {"ORTH": "_"}, {"LOWER": "lead"}]
 matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2,
 twelve_lead_pattern_3, twelve_lead_pattern_4])
 
-# Function to extract named entities
-def extract_named_entities(text):
-    doc = nlp(text)
-    entities = [(ent.text, ent.label_) for ent in doc.ents]
-    return entities
-
-# Apply the function to the 'text' column
-df['named_entities'] = df['impressionPlan']\
-    .apply(extract_named_entities)
-
-# Print three example lines from the df head
-print(df.head(3))
-
-# Visualize the entities in displacy
-# Check for numbers and presence of "lead" - print and flag in new column
-# 21/1/25 - NEED TO CHANGE line 63; if no "12 lead" is found it breaks the code
-# NB it also trips false positive if another number, e.g. "3 lead", is found
-# TRY PATTERN MATCHING INSTEAD - SEE ROW 71
+# Apply the matcher to each row of the dataframe:
 for index, row in df.iterrows():
     doc = nlp(row['impressionPlan'])
-    displacy.render(doc, style="ent", jupyter=True)
-    # New loop to ID 12 lead ecg
-    for token in doc:
-        # Check if token is like a number
-        if token.like_num:
-            # Get the next token
-            next_token = doc[token.i + 1]
-            # Check if next token is "lead"
-            if next_token.text == "lead":
-                print("12-lead ECG found:", token.text, next_token.text)
-                # Add a 12-lead flag in new column
-                df.loc[index, 'twelve_lead_flag'] = 1 # This line breaks the code if no match is found
-
-# Print results of new flag
-print(df.twelve_lead_flag.value_counts())
-df.loc[df.twelve_lead_flag == 1, :]
-
-# Apply the matcher to the doc
-matches = matcher(doc)
-
-# Print the matches
-for match_id, start, end in matches:
-    span = doc[start:end]
-    print(f"Matched span: {span.text}")
+    matches = matcher(doc)
+    # Print the matches
+    for match_id, start, end in matches:
+        span = doc[start:end]
+        print(f"Matched span: {span.text}")
