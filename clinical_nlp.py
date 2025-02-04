@@ -4,14 +4,23 @@ import spacy
 import en_core_web_sm
 from spacy import displacy
 
+# import the negex negation algortihm from the negspacy library
+from negspacy.negation import Negex
+
 # import the spacy pattern matcher@
 from spacy.matcher import Matcher
 
 # Load the pre-trained model as a language model into a variable called nlp
 nlp = en_core_web_sm.load()
 
+# Add the negation detection pipeline ("negex") to the spaCy NLP object. 
+# The config parameter specifies which entity types to consider for negation 
+# detection, in this case, "PERSON" and "ORG" (organization).
+nlp.add_pipe("negex")#, config={"ent_types":["PERSON","ORG"]})
+
+# 4/2/25 - NEED TO MAKE A CUSTOM ENTITY TYPE FOR MY MATCHED SPANS TO POINT NEGEX AT
+
 # Read the clinical data into a dataframe, selecting only certain columns
-# NEXT - Look for NEGATION, e.g. "12 lead not done"
 # ALSO LOOK IN THE ZOLL FIELD OF EPR FOR 12 LEAD
 # Compare the matched span column with "12 lead taken" boolean field
     # Look in BI009062 Supporting the review of Clinical Records DATA MASTER v0.2 - 20241003
@@ -34,10 +43,10 @@ df = pd.read_csv("nlp_input.csv"
 #     subset='impressionPlan',
 #  inplace=True)
 
-# # TEST ROW FOR 12 LEAD ECG - Remove later
-# df = df[3:4] # Row contains a great positive/negative 12 lead example 
-# # force in some text to check how Spacy handles various entries
-# df.iloc[0,1] = "12      lead"
+# TEST ROW FOR 12 LEAD ECG - Remove later
+df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# force in some text to check how Spacy handles various entries
+df.iloc[0,1] = "no 12 lead done"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
@@ -69,7 +78,8 @@ for index, row in df.iterrows():
     for match_id, start, end in matches:
         span = doc[start:end]
         row_matches.append(span.text)
-        print(f"Row {index}, Matched span: {span.text}")
+        # print(f"Row {index}, Matched span: {span.text}")
+        print(f"Row {index}, Matched span: {span.text}, Negation: {span._.negex}")
     
     # Join all matches for this row into a single string
     df.at[index, 'matched_spans'] = '; '.join(row_matches)
