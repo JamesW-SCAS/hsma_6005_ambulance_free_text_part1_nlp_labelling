@@ -11,8 +11,13 @@ from spacy.matcher import Matcher
 nlp = en_core_web_sm.load()
 
 # Read the clinical data into a dataframe, selecting only certain columns
-# NEXT - TRY WITH MORE THAN ONE FREE TEXT COLUMN
+# NEXT - Look for NEGATION, e.g. "12 lead not done"
 # ALSO LOOK IN THE ZOLL FIELD OF EPR FOR 12 LEAD
+# Compare the matched span column with "12 lead taken" boolean field
+    # Look in BI009062 Supporting the review of Clinical Records DATA MASTER v0.2 - 20241003
+        # see tab "OHCAO data set", column "12 lead taken"
+            # Test for rows where we have added value
+# NEXT RULE to try - "Oxygen administered", or e.g. "o2 given"
 
 filtered_cols = [
     'CareepisodeID',
@@ -21,13 +26,13 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-# , nrows=20
+, nrows=20
 , encoding_errors='ignore'
 )
 # Drop any rows with null data
-df.dropna(
-    subset='impressionPlan',
- inplace=True)
+# df.dropna(
+#     subset='impressionPlan',
+#  inplace=True)
 
 # # TEST ROW FOR 12 LEAD ECG - Remove later
 # df = df[3:4] # Row contains a great positive/negative 12 lead example 
