@@ -30,20 +30,30 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=100
+, nrows=5
 , encoding_errors='ignore'
 )
 
+# TEST ROW - Remove later
+df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# force in some text to check how Spacy handles various entries
+df.iloc[0,1] = "I'm looking for oxygen admin here."
+
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
+
 # Create a pattern to match 12 lead, including text and punctuation:
 twelve_lead_pattern_1 = [{"ORTH" : "12"}, {"IS_PUNCT": True, "OP": "?"},
 {"LOWER" : "lead"}]
 twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
 {"LOWER": "lead"}]
 
+# Oxygen pattern match rule
+o2_pattern_1 = [{"LOWER": "oxygen"}, {"LOWER" : "admin"}]
+
 # Add the pattern(s) to the Matcher
-matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2])
+matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2,\
+    o2_pattern_1])
 
 # Create a new column to store all matches
 df['matched_spans'] = ''
