@@ -6,6 +6,8 @@ from spacy import displacy
 
 # import the negex negation algortihm from the negspacy library
 from negspacy.negation import Negex
+# Negation (neg) - import Span library
+from spacy.tokens import Span
 
 # import the spacy pattern matcher@
 from spacy.matcher import Matcher
@@ -19,13 +21,6 @@ nlp = en_core_web_sm.load()
 nlp.add_pipe("negex")#, config={"ent_types":["PERSON","ORG"]})
 
 # 4/2/25 - NEED TO MAKE A CUSTOM ENTITY TYPE FOR MY MATCHED SPANS TO POINT NEGEX AT
-
-# Read the clinical data into a dataframe, selecting only certain columns
-# ALSO LOOK IN THE ZOLL FIELD OF EPR FOR 12 LEAD
-# Compare the matched span column with "12 lead taken" boolean field
-    # Look in BI009062 Supporting the review of Clinical Records DATA MASTER v0.2 - 20241003
-        # see tab "OHCAO data set", column "12 lead taken"
-            # Test for rows where we have added value
 # NEXT RULE to try - "Oxygen administered", or e.g. "o2 given"
 
 filtered_cols = [
@@ -35,18 +30,9 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=20
+, nrows=100
 , encoding_errors='ignore'
 )
-# Drop any rows with null data
-# df.dropna(
-#     subset='impressionPlan',
-#  inplace=True)
-
-# TEST ROW FOR 12 LEAD ECG - Remove later
-df = df[3:4] # Row contains a great positive/negative 12 lead example 
-# force in some text to check how Spacy handles various entries
-df.iloc[0,1] = "no 12 lead done"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
