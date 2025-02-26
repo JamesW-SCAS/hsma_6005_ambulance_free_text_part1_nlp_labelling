@@ -30,15 +30,15 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 5
+, nrows = 500
 , encoding_errors='ignore'
 )
 
 # TEST ROW - Remove later
-df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # force in some text to check how Spacy handles various entries
-df.iloc[0,1] = "I'm looking for no oxygen admin and no 12 lead here."
-df.iloc[0,2] = "...and 12 lead here"
+# df.iloc[0,1] = "I'm looking for no gave oxygen, was taken, and no 12 lead here."
+# df.iloc[0,2] = "...and air taken here"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
@@ -51,10 +51,30 @@ twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
 
 # Oxygen pattern match rule
 o2_pattern_1 = [{"LOWER": "oxygen"}, {"LOWER" : "admin"}]
+o2_pattern_2 = [{"LEMMA" : "oxygen"}, {"POS" : "VERB"}]
+o2_pattern_3 = [{"POS" : "VERB"}, {"LEMMA" : "oxygen"}]
+o2_pattern_4 = [{"LOWER": "o2"}, {"LOWER" : "admin"}]
+o2_pattern_5 = [{"LEMMA" : "o2"}, {"POS" : "VERB"}]
+o2_pattern_6 = [{"POS" : "VERB"}, {"LEMMA" : "o2"}]
+o2_pattern_7 = [{"LOWER": "oxy"}, {"LOWER" : "admin"}]
+o2_pattern_8 = [{"LEMMA" : "oxy"}, {"POS" : "VERB"}]
+o2_pattern_9 = [{"POS" : "VERB"}, {"LEMMA" : "oxy"}]
 
 # Add the pattern(s) to the Matcher
-matcher.add("lead_pattern", [twelve_lead_pattern_1, twelve_lead_pattern_2,\
-    o2_pattern_1])
+matcher.add("lead_pattern", \
+    [
+    # twelve_lead_pattern_1, 
+    # twelve_lead_pattern_2, 
+    o2_pattern_1, 
+    o2_pattern_2, 
+    o2_pattern_3,
+    o2_pattern_4,
+    o2_pattern_5,
+    o2_pattern_6,
+    o2_pattern_7,
+    o2_pattern_8,
+    o2_pattern_9,
+    ])
 
 # Create a new column to store all matches
 df['matched_spans'] = ''
