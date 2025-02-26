@@ -27,10 +27,11 @@ filtered_cols = [
     'CareepisodeID',
     'impressionPlan',
     'injuryIllnessDetails'
+    # 'Oxygen Administered' # This is the button-press field; need to add to input csv
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 500
+, nrows = 50
 , encoding_errors='ignore'
 )
 
@@ -50,6 +51,8 @@ twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
 {"LOWER": "lead"}]
 
 # Oxygen pattern match rule
+# ISSUE - too many possible patterns, e.g. these all miss "oxygen was given"
+# CROSS-CHECK WTIH SUE'S LABELLED DATA AND CREW BUTTON-PRESS COLUMNS
 o2_pattern_1 = [{"LOWER": "oxygen"}, {"LOWER" : "admin"}]
 o2_pattern_2 = [{"LEMMA" : "oxygen"}, {"POS" : "VERB"}]
 o2_pattern_3 = [{"POS" : "VERB"}, {"LEMMA" : "oxygen"}]
@@ -61,10 +64,11 @@ o2_pattern_8 = [{"LEMMA" : "oxy"}, {"POS" : "VERB"}]
 o2_pattern_9 = [{"POS" : "VERB"}, {"LEMMA" : "oxy"}]
 
 # Add the pattern(s) to the Matcher
+# MAKE SEPARATE PATTERNS TO LABEL "TWELVE LEAD", "OXYGEN", ETC FOR NEURAL NET?
 matcher.add("lead_pattern", \
     [
-    # twelve_lead_pattern_1, 
-    # twelve_lead_pattern_2, 
+    twelve_lead_pattern_1, 
+    twelve_lead_pattern_2, 
     o2_pattern_1, 
     o2_pattern_2, 
     o2_pattern_3,
