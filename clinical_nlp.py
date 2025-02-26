@@ -37,7 +37,8 @@ df = pd.read_csv("nlp_input.csv"
 # TEST ROW - Remove later
 df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # force in some text to check how Spacy handles various entries
-df.iloc[0,1] = "I'm looking for oxygen admin here."
+df.iloc[0,1] = "I'm looking for no oxygen admin and no 12 lead here."
+df.iloc[0,2] = "...and 12 lead here"
 
 # Initialize the Matcher with the shared vocabulary
 matcher = Matcher(nlp.vocab)
