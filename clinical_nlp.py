@@ -30,7 +30,7 @@ filtered_cols = [
     ]
 df = pd.read_csv("nlp_input.csv"
 , usecols = filtered_cols
-, nrows=5
+, nrows = 5
 , encoding_errors='ignore'
 )
 
