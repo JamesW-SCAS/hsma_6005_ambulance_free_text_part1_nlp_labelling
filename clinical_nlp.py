@@ -18,20 +18,22 @@ nlp = en_core_web_sm.load()
 # Add the negation detection pipeline ("negex") to the spaCy NLP object. 
 # The config parameter specifies which entity types to consider for negation 
 # detection, in this case, "PERSON" and "ORG" (organization).
-nlp.add_pipe("negex")#, config={"ent_types":["PERSON","ORG"]})
+
+# Take Negex out for now to see if it speeds up processing
+# nlp.add_pipe("negex")#, config={"ent_types":["PERSON","ORG"]})
 
 # 4/2/25 - NEED TO MAKE A CUSTOM ENTITY TYPE FOR MY MATCHED SPANS TO POINT NEGEX AT
 # NEXT RULE to try - "Oxygen administered", or e.g. "o2 given"
 
 filtered_cols = [
-    'CareepisodeID',
+    'CareEpisodeID',  # Added a capital E in Episode to match input file column 28/2/25
     'impressionPlan',
     'injuryIllnessDetails'
     # 'Oxygen Administered' # This is the button-press field; need to add to input csv
     ]
-df = pd.read_csv("nlp_input.csv"
+df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 50
+# , nrows = 100
 , encoding_errors='ignore'
 )
 
@@ -77,7 +79,7 @@ matcher.add("lead_pattern", \
     o2_pattern_6,
     o2_pattern_7,
     o2_pattern_8,
-    o2_pattern_9,
+    o2_pattern_9
     ])
 
 # Create a new column to store all matches
@@ -100,7 +102,7 @@ for index, row in df.iterrows():
         span = doc[start:end]
         row_matches.append(span.text)
         # print(f"Row {index}, Matched span: {span.text}")
-        print(f"Row {index}, Matched span: {span.text}, Negation: {span._.negex}")
+        print(f"Row {index}, Matched span: {span.text}") # , Negation: {span._.negex}")
     
     # Join all matches for this row into a single string
     df.at[index, 'matched_spans'] = '; '.join(row_matches)
