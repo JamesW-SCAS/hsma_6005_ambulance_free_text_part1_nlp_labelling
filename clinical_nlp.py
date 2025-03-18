@@ -33,7 +33,7 @@ filtered_cols = [
     ]
 df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-# , nrows = 100
+, nrows = 100
 , encoding_errors='ignore'
 )
 
@@ -66,11 +66,15 @@ o2_pattern_8 = [{"LEMMA" : "oxy"}, {"POS" : "VERB"}]
 o2_pattern_9 = [{"POS" : "VERB"}, {"LEMMA" : "oxy"}]
 
 # Add the pattern(s) to the Matcher
-# MAKE SEPARATE PATTERNS TO LABEL "TWELVE LEAD", "OXYGEN", ETC FOR NEURAL NET?
-matcher.add("lead_pattern", \
+# MAKE SEPARATE PATTERNS TO LABEL "TWELVE LEAD", "OXYGEN", ETC FOR NEURAL NET
+matcher.add("12_lead_ecg", \
     [
     twelve_lead_pattern_1, 
-    twelve_lead_pattern_2, 
+    twelve_lead_pattern_2
+    ])
+
+matcher.add("oxygen",\
+    [
     o2_pattern_1, 
     o2_pattern_2, 
     o2_pattern_3,
@@ -99,10 +103,11 @@ for index, row in df.iterrows():
     
     # Process all matches
     for match_id, start, end in matches:
+        string_id = nlp.vocab.strings[match_id]  # Get string representation
         span = doc[start:end]
         row_matches.append(span.text)
         # print(f"Row {index}, Matched span: {span.text}")
-        print(f"Row {index}, Matched span: {span.text}") # , Negation: {span._.negex}")
+        print(f"Row {index}, Matched span: {span.text}, String_ID : {string_id}") # , Negation: {span._.negex}")
     
     # Join all matches for this row into a single string
     df.at[index, 'matched_spans'] = '; '.join(row_matches)
