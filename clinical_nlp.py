@@ -88,10 +88,12 @@ matcher.add("oxygen",\
 
 # Create a new column to store all matches
 df['matched_spans'] = ''
+# Create new column to store all labels of matched spans
+df['train_labels'] = ''
 
 # Apply the matcher to each row of the dataframe:
 for index, row in df.iterrows():
-    # Combine text in multiple columsn into a single string and pass to nlp
+    # Combine text in multiple columns into a single string and pass to nlp
     doc = nlp(str(row['impressionPlan'])
     + ' '
     + str(row['injuryIllnessDetails'])
@@ -100,17 +102,23 @@ for index, row in df.iterrows():
     
     # List to store all matches for this row
     row_matches = []
+    # List to store all string_ids (training labels)
+    match_labels = []
     
     # Process all matches
     for match_id, start, end in matches:
         string_id = nlp.vocab.strings[match_id]  # Get string representation
         span = doc[start:end]
         row_matches.append(span.text)
+        match_labels.append(string_id)
         # print(f"Row {index}, Matched span: {span.text}")
         print(f"Row {index}, Matched span: {span.text}, String_ID : {string_id}") # , Negation: {span._.negex}")
     
     # Join all matches for this row into a single string
     df.at[index, 'matched_spans'] = '; '.join(row_matches)
+    # Join all labels of matched spans in this row into a single string
+    # LOOK AT SPACY PIPELINE TRAINING - MIGHT BE MORE EFFICIENT
+    df.at[index, 'train_labels'] = '; '.join(match_labels)
 
 # Print summary
 print(f"\nTotal rows with matches: {df['matched_spans'].astype(bool).sum()}")
