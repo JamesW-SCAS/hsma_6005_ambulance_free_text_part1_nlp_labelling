@@ -38,9 +38,9 @@ df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.cs
 )
 
 # TEST ROW - Remove later
-# df = df[3:4] # Row contains a great positive/negative 12 lead example 
+df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # force in some text to check how Spacy handles various entries
-# df.iloc[0,1] = "I'm looking for no gave oxygen, was taken, and no 12 lead here."
+df.iloc[0,1] = "I'm looking for no gave oxygen, was taken, and no 12 lead here. More oxygen given"
 # df.iloc[0,2] = "...and air taken here"
 
 # Initialize the Matcher with the shared vocabulary
@@ -102,15 +102,17 @@ for index, row in df.iterrows():
     
     # List to store all matches for this row
     row_matches = []
-    # List to store all string_ids (training labels)
-    match_labels = []
+    # List to store all string_ids (training labels) in a SET (unique values)
+    match_labels = set()
     
     # Process all matches
     for match_id, start, end in matches:
         string_id = nlp.vocab.strings[match_id]  # Get string representation
         span = doc[start:end]
         row_matches.append(span.text)
-        match_labels.append(string_id)
+        # TRY changing line below to elimnate duplication of matching
+        # string_id's - see Perplexity search results 18/3/25
+        match_labels.add(string_id)
         # print(f"Row {index}, Matched span: {span.text}")
         print(f"Row {index}, Matched span: {span.text}, String_ID : {string_id}") # , Negation: {span._.negex}")
     
