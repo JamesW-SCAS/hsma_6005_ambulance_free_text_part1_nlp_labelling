@@ -5,6 +5,7 @@ import en_core_web_sm
 from negspacy.negation import Negex
 from spacy.tokens import Span
 from spacy.matcher import Matcher
+from tqdm.auto import tqdm  # Import tqdm for progress bar
 
 # Load the pre-trained model as a language model into a variable called nlp
 nlp = en_core_web_sm.load()
@@ -18,14 +19,14 @@ filtered_cols = [
 
 df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 100
+, nrows = 1000
 , encoding_errors='ignore'
 )
 
 # TEST ROW - Remove later
-df = df[3:4] # Row contains a great positive/negative 12 lead example 
+# df = df[3:4] # Row contains a great positive/negative 12 lead example 
 # force in some text to check how Spacy handles various entries
-df.iloc[0,1] = "12 lead ecg was done but no oxygen given" #"I'm looking for no oxygen not given, was taken, and no 12 lead here. More oxygen given. And another twelve lead"
+# df.iloc[0,1] = "12 lead ecg was done but no oxygen given" #"I'm looking for no oxygen not given, was taken, and no 12 lead here. More oxygen given. And another twelve lead"
 # df.iloc[0,2] = "...and air taken here"
 
 # Initialize the Matcher with the shared vocabulary
@@ -79,16 +80,16 @@ df['oxygen_label_found'] = 0
 df['oxygen_label_negated'] = 0
 
 # Apply the matcher to each row of the dataframe:
-for index, row in df.iterrows():
+for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows"):
     # Combine text in multiple columns into a single string and pass to nlp
     doc = nlp(str(row['impressionPlan'])
     + ' '
     + str(row['injuryIllnessDetails'])
     )
         
-    print(f"Row {index}:")
+    # print(f"Row {index}:")
     for e in doc.ents:
-        print(f"Entity: {e.text}, Label: {e.label_}, Negation: {e._.negex}")
+        # print(f"Entity: {e.text}, Label: {e.label_}, Negation: {e._.negex}")
         # Check if entity label matches a custom entity, and set flag
         # 12-lead label
         if e.label_ == '12_lead_ecg_label':
@@ -103,4 +104,8 @@ for index, row in df.iterrows():
             if e._.negex == True:
                 df.at[index, "oxygen_label_negated"] = 1
 
-df
+# Print value counts for the neural net flag columns
+col_list = ['12_lead_label_found', '12_lead_label_negated', \
+    'oxygen_label_found', 'oxygen_label_negated']
+for col in col_list:
+    print(df[col].value_counts())
