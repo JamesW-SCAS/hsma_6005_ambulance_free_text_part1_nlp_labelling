@@ -19,7 +19,7 @@ filtered_cols = [
 
 df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 1000
+, nrows = 10
 , encoding_errors='ignore'
 )
 
@@ -109,3 +109,6 @@ col_list = ['12_lead_label_found', '12_lead_label_negated', \
     'oxygen_label_found', 'oxygen_label_negated']
 for col in col_list:
     print(df[col].value_counts())
+
+# Output to CSV file:
+# df.to_csv('training_data.csv', index=False)
