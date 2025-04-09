@@ -6,9 +6,13 @@ import pandas as pd
 
 # Create sample DataFrame
 df = pd.DataFrame({'text_column': [
-    "12 lead ecg was done but no oxygen given",
-    "oxygen saturation levels were normal",
-    "12 lead ecg showed abnormalities but no oxygen therapy"
+    # "12 lead ecg was done but no oxygen given",
+    # "oxygen saturation levels were normal",
+    # "12 lead ecg showed abnormalities but no oxygen therapy",
+    
+    # BELOW ARE REAL EXTRACTS - JW 9/4/25
+    "pulse strong and regular, 12 lead ecg - RBBB, well perfused, no chest pain, no JVD, no palpitations at present.",
+    "CVS - denies chest pain, 12 lead ECG shows 1st degree AV block, strong regular radials, no postural drop, well perfused, states he does not feel dizzy on standing"
 ]})
 
 # Load spaCy model and define matcher
