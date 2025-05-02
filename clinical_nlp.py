@@ -19,7 +19,7 @@ filtered_cols = [
 
 df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 10
+, nrows = 500
 , encoding_errors='ignore'
 )
 
@@ -40,7 +40,8 @@ twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
 
 # Oxygen pattern match rule
 # **IMPROVE THIS WITH "O2" ETC... - 29/4/25
-o2_pattern_1 = [{"LOWER": "oxygen"}] 
+o2_pattern_1 = [{"LOWER": "oxygen"}]
+o2_pattern_2 = [{"LOWER": "o2"}]
 
 # Add the pattern(s) to the Matcher
 matcher.add("12_lead_ecg_label", \
@@ -50,7 +51,8 @@ matcher.add("12_lead_ecg_label", \
     ])
 matcher.add("oxygen_label",\
     [
-    o2_pattern_1, 
+    o2_pattern_1,
+    o2_pattern_2 
     ])
 
 # # Create a new column to store all matches
@@ -95,12 +97,16 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows"):
         # 12-lead label
         if e.label_ == '12_lead_ecg_label':
             df.at[index, "12_lead_label_found"] = 1
+            # Capture the sentence containing the entity
+            df.at[index, "12_lead_label_sentence"] = e.sent.text
             # Check if the label was negated, and set flag
             if e._.negex == True:
                 df.at[index, "12_lead_label_negated"] = 1
         # Oxygen label
         if e.label_ == 'oxygen_label':
             df.at[index, "oxygen_label_found"] = 1
+            # Capture the sentence containing the entity
+            df.at[index, "oxygen_label_sentence"] = e.sent.text
             # Check if the label was negated, and set flag
             if e._.negex == True:
                 df.at[index, "oxygen_label_negated"] = 1
@@ -112,4 +118,4 @@ for col in col_list:
     print(df[col].value_counts())
 
 # Output to CSV file:
-# df.to_csv('training_data.csv', index=False)
+df.to_csv('training_data.csv', index=False)
