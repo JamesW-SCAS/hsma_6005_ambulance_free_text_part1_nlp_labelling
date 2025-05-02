@@ -39,6 +39,7 @@ twelve_lead_pattern_2 = [{"LOWER": "twelve"}, {"IS_PUNCT": True, "OP": "?"},
 {"LOWER": "lead"}]
 
 # Oxygen pattern match rule
+# **IMPROVE THIS WITH "O2" ETC... - 29/4/25
 o2_pattern_1 = [{"LOWER": "oxygen"}] 
 
 # Add the pattern(s) to the Matcher
