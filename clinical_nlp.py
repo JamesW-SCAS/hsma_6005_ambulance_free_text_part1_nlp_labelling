@@ -6,9 +6,12 @@ from negspacy.negation import Negex
 from spacy.tokens import Span
 from spacy.matcher import Matcher
 from tqdm.auto import tqdm  # Import tqdm for progress bar
+from spacy.pipeline import Sentencizer
 
 # Load the pre-trained model as a language model into a variable called nlp
-nlp = en_core_web_sm.load()
+# nlp = en_core_web_sm.load()
+# Load model WITHOUT parser
+nlp = spacy.load("en_core_web_sm", exclude=["parser"])
 
 filtered_cols = [
     'CareEpisodeID',  # Added a capital E in Episode to match input file column 28/2/25
@@ -19,7 +22,7 @@ filtered_cols = [
 
 df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 1000
+, nrows = 100
 , encoding_errors='ignore'
 )
 
@@ -69,6 +72,11 @@ def custom_ents_component(doc):
     # print(spans)
     doc.ents = spans
     return doc
+
+# Add sentencizer to pipeline
+# nlp.add_pipe("sentencizer", config={"punct_chars": [".", ","]})
+config = {"punct_chars": [".", ","]}
+nlp.add_pipe("sentencizer", config=config)
 
 # Try adding components to the pipeline in order, as per Sammi's notebook
 nlp.add_pipe("custom_ents_component", after="ner")
