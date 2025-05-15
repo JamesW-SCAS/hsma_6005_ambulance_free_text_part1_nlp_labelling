@@ -19,7 +19,7 @@ filtered_cols = [
 
 df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
 , usecols = filtered_cols
-, nrows = 500
+, nrows = 1000
 , encoding_errors='ignore'
 )
 
@@ -96,20 +96,36 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows"):
         # Check if entity label matches a custom entity, and set flag
         # 12-lead label
         if e.label_ == '12_lead_ecg_label':
+            # Add flag that the label was found
             df.at[index, "12_lead_label_found"] = 1
             # Capture the sentence containing the entity
             df.at[index, "12_lead_label_sentence"] = e.sent.text
+            # run nlp on JUST the sentence for negex
+            # IMPROVE with sentencizer - rules based (use comma as delimiter)
+            sent = nlp(e.sent.text)
             # Check if the label was negated, and set flag
-            if e._.negex == True:
-                df.at[index, "12_lead_label_negated"] = 1
+            for e in sent.ents:
+                if e._.negex == True:
+                    df.at[index, "12_lead_label_negated"] = 1
+            # Redundant code - negation on whole doc
+            # if e._.negex == True:
+            #         df.at[index, "12_lead_label_negated"] = 1
+
         # Oxygen label
         if e.label_ == 'oxygen_label':
             df.at[index, "oxygen_label_found"] = 1
             # Capture the sentence containing the entity
             df.at[index, "oxygen_label_sentence"] = e.sent.text
+            # run nlp on JUST the sentence for negex
+            # IMPROVE with sentencizer - rules based (use comma as delimiter)
+            sent = nlp(e.sent.text)
             # Check if the label was negated, and set flag
-            if e._.negex == True:
-                df.at[index, "oxygen_label_negated"] = 1
+            for e in sent.ents:
+                if e._.negex == True:
+                    df.at[index, "oxygen_label_negated"] = 1
+            # Redundant code - negation on whole doc
+            # if e._.negex == True:
+            #     df.at[index, "oxygen_label_negated"] = 1
 
 # Print value counts for the neural net flag columns
 col_list = ['12_lead_label_found', '12_lead_label_negated', \
@@ -118,4 +134,4 @@ for col in col_list:
     print(df[col].value_counts())
 
 # Output to CSV file:
-df.to_csv('training_data.csv', index=False)
+# df.to_csv('training_data.csv', index=False)
