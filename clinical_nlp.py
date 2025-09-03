@@ -20,9 +20,11 @@ filtered_cols = [
     # 'Oxygen Administered' # This is the button-press field; need to add to input csv
     ]
 
-df = pd.read_csv("Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
+df = pd.read_csv(
+    # "Oxygen and 12 Lead Free Text Training Model v0.1 - 20250227.csv" #"nlp_input.csv"
+    "hsma_test_data_feb_2025.csv"
 , usecols = filtered_cols
-, nrows = 100
+# , nrows = 100
 , encoding_errors='ignore'
 )
 
@@ -57,11 +59,6 @@ matcher.add("oxygen_label",\
     o2_pattern_1,
     o2_pattern_2 
     ])
-
-# # Create a new column to store all matches
-# df['matched_spans'] = ''
-# # Create new column to store all labels of matched spans
-# df['train_labels'] = ''
 
 # Add the custom language component here:
 @spacy.Language.component("custom_ents_component")
@@ -109,7 +106,6 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows"):
             # Capture the sentence containing the entity
             df.at[index, "12_lead_label_sentence"] = e.sent.text
             # run nlp on JUST the sentence for negex
-            # IMPROVE with sentencizer - rules based (use comma as delimiter)
             sent = nlp(e.sent.text)
             # Check if the label was negated, and set flag
             for e in sent.ents:
@@ -125,7 +121,6 @@ for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows"):
             # Capture the sentence containing the entity
             df.at[index, "oxygen_label_sentence"] = e.sent.text
             # run nlp on JUST the sentence for negex
-            # IMPROVE with sentencizer - rules based (use comma as delimiter)
             sent = nlp(e.sent.text)
             # Check if the label was negated, and set flag
             for e in sent.ents:
@@ -142,4 +137,4 @@ for col in col_list:
     print(df[col].value_counts())
 
 # Output to CSV file:
-# df.to_csv('training_data.csv', index=False)
+df.to_csv('test_ner_data_feb_2025.csv', index=False)
