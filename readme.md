@@ -10,6 +10,9 @@ performed the action or not.
 This project has two repos:
 1) NLP repo that labels the free-text data, and creates training data for 
 a neural network
+
+The main code is in the file "clinical_nlp.py"
+
 2) Neural Net repo that uses the output from repo 1 and uses it when training
 a custom neural network designed to look for negation in free-text, e.g. "
 I did not administer Oxygen"
