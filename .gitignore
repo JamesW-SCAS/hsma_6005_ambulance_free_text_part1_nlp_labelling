@@ -2,7 +2,9 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode,jupyternotebooks
 
 # Working files to ignore when uploading repo to GitHub
-"import spacy.py"
+import\ spacy.py
+negation_test_perplexity.py
+negspacy_custom_spans.ipynb
 
 ### JupyterNotebooks ###
 # gitignore template for Jupyter Notebooks
